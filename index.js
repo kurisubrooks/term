@@ -16,12 +16,12 @@ function createWindow() {
     const shell = child_process.spawn("bash");
 
     win.webContents.on("did-finish-load", () => {
-        ipcMain.on("shStdin", (evt, data) => {
+        ipcMain.on("shell_stdin", (evt, data) => {
             shell.stdin.write(data + "\n");
         });
 
         shell.stdout.on("data", data => {
-            win.webContents.send("shStdout", Buffer.from(data).toString());
+            win.webContents.send("shell_stdout", Buffer.from(data).toString());
         });
     });
 
