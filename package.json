@@ -1,0 +1,14 @@
+{
+  "name": "term",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "kurisubrooks",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^1.6.5"
+  }
+}

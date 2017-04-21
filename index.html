@@ -1,0 +1,22 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <script type="text/javascript">
+        const { ipcRenderer } = require("electron");
+
+        ipcRenderer.on("shStdout", (evt, data) => {
+            document.getElementById("shell").innerText += "\n" + data;
+        });
+
+        function clicked() {
+            const cmd = document.getElementById("cmd").value;
+            document.getElementById("shell").innerText += "\n> " + cmd;
+            ipcRenderer.send("shStdin", cmd);
+        }
+    </script>
+</head>
+<body>
+    <input id="cmd"></input><button id="run" onclick="javascript:clicked();">Run</button>
+    <div id="shell"></div>
+</body>
+</html>
