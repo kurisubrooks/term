@@ -48,6 +48,7 @@
                 const container = $(`<div class="line"></div>`);
                 const line = container.text(data + "\n");
                 $("#display").append(line);
+                return false;
             });
 
             $("#stdin").on("submit", event => {
