@@ -2,86 +2,87 @@
 <html>
 <head>
     <meta charset="utf-8">
+
+    <link href="res/terminal.css" rel="stylesheet">
+
     <style>
 
         html, body {
             margin: 0;
             height: 100%;
-            font-family: "SF Mono", "Roboto Mono", "Courier New", Courier, monospace;
         }
 
         .container {
             height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow-y: scroll;
+            overflow-x: hidden;
             background: #212121;
             color: #FFFFFF;
-            overflow-y: scroll;
+        }
+
+        .container .frame {
+            display: flex;
+            justify-content: space-between;
+
+            background: #333333;
+            color: #FFFFFF;
+        }
+
+        .container .frame .title {
+            font-family: "Roboto", sans-serif;
+        }
+
+        .container .frame .title,
+        .container .frame .controls {
+            padding: 8px 16px;
+        }
+
+        .container .frame .controls span {
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+            top: 2px;
+        }
+
+        .container .frame .controls span:not(:first-child) {
+            margin-left: 6px;
         }
 
         .container .shell {
             padding: 8px 8px;
         }
 
-        .line {
-
+        .container .shell .terminal {
+            background: #212121;
+            font-family: "SF Mono", "Roboto Mono", "Courier New", Courier, monospace;
         }
 
-        input[type=text] {
-            -webkit-appearance: none;
-            border: none;
+        .container .shell .terminal .xterm-viewport {
             background: transparent;
-            font: inherit;
-            color: inherit;
-        }
-
-        input:focus {
-            outline: none;
         }
 
     </style>
-    <script>
-
-        const $ = window.jQuery = require("jquery");
-        const { ipcRenderer } = require("electron");
-
-        $(function() {
-            ipcRenderer.on("shell_stdout", (env, data) => {
-                const container = $(`<div class="line"></div>`);
-                const line = container.text(data + "\n");
-                $("#display").append(line);
-                return false;
-            });
-
-            $("#stdin").on("submit", event => {
-                event.preventDefault();
-
-                const input = $("#stdin #in").val();
-                const container = $(`<div class="line"></div>`);
-                const line = container.text(input + "\n");
-                const reset = $("#stdin #in").val("");
-
-                $("#display").append(line);
-
-                ipcRenderer.send("shell_stdin", input);
-
-                return false;
-            });
-        });
-
-    </script>
 </head>
 <body>
 
     <div class="container">
-        <div class="shell" id="display">
-            <!-- uwu -->
+        <div class="frame">
+            <div class="title">Terminal</div>
+            <div class="controls">
+                <span id="minimize"><img src="res/min.png"></span>
+                <span id="maximize"><img src="res/max.png"></span>
+                <span id="close"><img src="res/close.png"></span>
+            </div>
         </div>
 
-        <div class="input">
-            <form target="" id="stdin">
-                <input type="text" id="in" placeholder="Type here">
-            </form>
-        </div>
+        <div class="shell" id="display"></div>
     </div>
+
+    <script>
+        require("./terminal.js");
+    </script>
 
 </body>
 </html>
