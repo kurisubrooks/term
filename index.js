@@ -1,41 +1,37 @@
-const { app, BrowserWindow, webContents, ipcMain } = require("electron");
-const path = require("path");
-const url = require("url");
-const child_process = require("child_process");
-let win;
+const { app, BrowserWindow, ipcMain } = require("electron");
+const spawn = require("child_process").spawn;
+let window = null;
 
-function createWindow() {
-    win = new BrowserWindow({
-        width: 800, height: 600,
-        title: "Term"
+const start = () => {
+    const shell = spawn("bash", ["--login"]);
+
+    const options = {
+        minWidth: 700,
+        minHeight: 460,
+        width: 900,
+        height: 550,
+        frame: false,
+        show: false
+    };
+
+    window = new BrowserWindow(options);
+    window.loadURL(`file://${__dirname}/index.html`);
+    window.once("ready-to-show", () => window.show());
+    window.on("closed", () => {
+        window = null;
     });
 
-    win.loadURL(`file://${path.join(__dirname, "index.html")}`);
-    // win.webContents.openDevTools();
-
-    const shell = child_process.spawn("bash");
-
-    win.webContents.on("did-finish-load", () => {
-        ipcMain.on("shell_stdin", (evt, data) => {
-            shell.stdin.write(data + "\n");
-        });
-
-        shell.stdout.on("data", data => {
-            win.webContents.send("shell_stdout", Buffer.from(data).toString());
-        });
+    ipcMain.on("shell_stdin", (evt, data) => {
+        shell.stdin.write(`${data}\n`);
     });
 
-    win.on("closed", () => {
-        win = null;
+    shell.stdout.on("data", data => {
+        window.webContents.send("shell_stdout", Buffer.from(data).toString());
     });
-}
 
-app.on("ready", createWindow);
+    shell.stderr.on("data", data => {
+        window.webContents.send("shell_stderr", Buffer.from(data).toString());
+    });
+};
 
-app.on("window-all-closed", () => {
-    if (process.platform !== "darwin") app.quit();
-});
-
-app.on("activate", () => {
-    if (win === null) createWindow();
-});
+app.once("ready", start);
